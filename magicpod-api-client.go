@@ -19,7 +19,7 @@ func main() {
 		// hidden option only for MagicPod developers
 		cli.StringFlag{
 			Name:   "url-base",
-			Value:  "https://magic-pod.com",
+			Value:  "https://app.magicpod.com",
 			Hidden: true,
 		},
 	}
@@ -34,7 +34,7 @@ func main() {
 				},
 				cli.StringFlag{
 					Name:  "setting, s",
-					Usage: "Test setting in JSON format. Please check https://magic-pod.com/api/v1.0/doc/ for more detail",
+					Usage: "Test setting in JSON format. Please check https://app.magicpod.com/api/v1.0/doc/ for more detail",
 				},
 				cli.BoolFlag{
 					Name:  "no_wait, n",
@@ -257,7 +257,7 @@ func commonFlags() []cli.Flag {
 	return []cli.Flag{
 		cli.StringFlag{
 			Name:   "token, t",
-			Usage:  "API token. You can get the value from https://magic-pod.com/accounts/api-token/",
+			Usage:  "API token. You can get the value from https://app.magicpod.com/accounts/api-token/",
 			EnvVar: "MAGICPOD_API_TOKEN",
 		},
 		cli.StringFlag{
