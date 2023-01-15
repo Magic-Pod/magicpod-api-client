@@ -114,6 +114,21 @@ func main() {
 			}...),
 			Action: getScrenshotsAction,
 		},
+		{
+			Name:  "wait-for-batch-run",
+			Usage: "Wait until a batch run ends",
+			Flags: append(commonFlags(), []cli.Flag{
+				cli.IntFlag{
+					Name:  "batch_run_number, b",
+					Usage: "Batch run number",
+				},
+				cli.IntFlag{
+					Name:  "wait_limit, w",
+					Usage: "Wait limit in seconds. If 0 is specified, the value is test count x 10 minutes",
+				},
+			}...),
+			Action: waitForBatchRunAction,
+		},
 	}
 	app.Run(os.Args)
 }
@@ -241,6 +256,36 @@ func batchRunAction(c *cli.Context) error {
 
 	_, existsErr, existsUnresolved, batchRunError := common.ExecuteBatchRun(urlBase, apiToken, organization,
 		project, httpHeadersMap, testSettingsNumber, setting, !noWait, waitLimit, true)
+	if batchRunError != nil {
+		return batchRunError
+	}
+	if existsErr {
+		return cli.NewExitError("", 1)
+	}
+	if existsUnresolved {
+		return cli.NewExitError("", 2)
+	}
+	return nil
+}
+
+func waitForBatchRunAction(c *cli.Context) error {
+	urlBase, apiToken, organization, project, httpHeadersMap, err := parseCommonFlags(c)
+	if err != nil {
+		return err
+	}
+	batchRunNumber := c.Int("batch_run_number")
+	if batchRunNumber == 0 {
+		return cli.NewExitError("--batch_run_number option is not specified or 0", 1)
+	}
+	waitLimit := c.Int("wait_limit")
+
+	batchRunUnderProgress, batchRunError := common.GetBatchRun(urlBase, apiToken, organization, project, httpHeadersMap, batchRunNumber)
+	if batchRunError != nil {
+		return batchRunError
+	}
+
+	_, existsErr, existsUnresolved, batchRunError := common.WaitForBatchRunResult(urlBase, apiToken, organization,
+		project, httpHeadersMap, batchRunUnderProgress, waitLimit, true)
 	if batchRunError != nil {
 		return batchRunError
 	}
