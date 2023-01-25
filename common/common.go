@@ -349,7 +349,6 @@ func ExecuteBatchRun(urlBase string, apiToken string, organization string, proje
 		return nil, false, false, exitErr
 	}
 
-	crossBatchRunTotalTestCount := batchRun.Test_Cases.Total
 	printMessage(printResult, "test result page:\n")
 	printMessage(printResult, "%s\n", batchRun.Url)
 
@@ -358,6 +357,14 @@ func ExecuteBatchRun(urlBase string, apiToken string, organization string, proje
 		return batchRun, false, false, nil
 	}
 
+	return WaitForBatchRunResult(urlBase, apiToken, organization, project, httpHeadersMap, batchRun, waitLimit, printResult)
+}
+
+func WaitForBatchRunResult(urlBase string, apiToken string, organization string, project string,
+	httpHeadersMap map[string]string, batchRun *BatchRun,
+	waitLimit int, printResult bool) (*BatchRun /*on which magicpod bitrise step depends */, bool, bool, *cli.ExitError) {
+
+	crossBatchRunTotalTestCount := batchRun.Test_Cases.Total
 	const initRetryInterval = 10 // retry more frequently at first
 	const retryInterval = 60
 	var limitSeconds int
