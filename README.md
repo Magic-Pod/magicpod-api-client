@@ -111,10 +111,10 @@ The step is like:
 4. After a while, you will receive an e-mail that notifies you that the notarization process has finished.
 
 ```
-# You can check certificate name by `security find-identity -v`
+# You can check certificate name and Team ID by `security find-identity -v`
 codesign -s <certificate name> -v --timestamp --options runtime out/mac64/magicpod-api-client
 # Zip again
 zip -jq out/mac64_magicpod-api-client.zip out/mac64/magicpod-api-client
 # Basically you need to specify app-specific password
-xcrun altool --notarize-app --primary-bundle-id "com.magicpod.api-client" --username "<Apple ID>" --file out/mac64_magicpod-api-client.zip
+xcrun notarytool submit out/mac64_magicpod-api-client.zip --apple-id <Apple ID> --team-id <Team ID> --wait
 ```
