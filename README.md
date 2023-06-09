@@ -100,21 +100,47 @@ GOOS=windows GOARCH=amd64 go build -o out/win64/magicpod-api-client.exe
 zip -jq out/win64_magicpod-api-client.exe.zip out/win64/magicpod-api-client.exe
 ```
 
-## Sign and Notarize Mac binary
+## Code-signing and Notarization of macOS binary
 
-You need to follow https://g3rv4.com/2019/06/bundling-signing-notarizing-go-application carefully.
-The step is like:
+> **Note**: The similar process is not necessary for Windows and Linux binary.
 
-1. Build binaries.
-2. Create app-specific password for the Apple ID according to [this article](https://support.apple.com/en-us/HT204397).
-3. Run the following on the top directory.
-4. After a while, you will receive an e-mail that notifies you that the notarization process has finished.
+To make a distributable binary for macOS, we need to code-sign and notarize the app. Otherwise, the app cannot be opened in the other machine due to macOS security feature to prevent malware.
 
-```
-# You can check certificate name by `security find-identity -v`
+### Prerequisites
+
+- [ ] Store certificate for code-signing
+- [ ] Create an app-specific password for the Apple ID
+
+### Procedures
+
+The basic procedures are as follows.
+
+1. Build a macOS binary
+2. Code-sign the binary
+3. Zip the binary file before submission
+4. Submit the zip file for notarization
+
+> **Note**: You can check `<certificate name>` and `<Team ID>` by `security find-identity -v -p codesigning`.
+
+The following is an example script.
+
+```sh
+# Build a macOS binary.
+GOOS=darwin GOARCH=amd64 go build -o out/mac64/magicpod-api-client
+
+# Code-sign the binary.
 codesign -s <certificate name> -v --timestamp --options runtime out/mac64/magicpod-api-client
-# Zip again
+
+# For notarization, the binary file must be archived into a zip file.
 zip -jq out/mac64_magicpod-api-client.zip out/mac64/magicpod-api-client
-# Basically you need to specify app-specific password
-xcrun altool --notarize-app --primary-bundle-id "com.magicpod.api-client" --username "<Apple ID>" --file out/mac64_magicpod-api-client.zip
+
+# Submit the zip file for notarization.
+# You'll be asked to enter the app-specific password after this command.
+xcrun notarytool submit out/mac64_magicpod-api-client.zip --apple-id <Apple ID> --team-id <Team ID> --wait
 ```
+
+### References
+
+- [Apple: Sign in to apps with your Apple ID using app-specific passwords](https://support.apple.com/en-us/HT204397)
+- [Apple: Code Signing Tasks](https://developer.apple.com/library/archive/documentation/Security/Conceptual/CodeSigningGuide/Procedures/Procedures.html)
+- [Apple: Upload your app to the notarization service](https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/customizing_the_notarization_workflow#3087734)
