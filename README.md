@@ -75,6 +75,21 @@ wait $PID1
 wait $PID2
 ```
 
+> **Note**: The default of Wait limit in seconds is 300 seconds.
+
+You can also specify the wait limit in seconds. If execution time of your [BatchRun/CrossBatchRun](https://app.magicpod.com/api/v1.0/doc/) is expected to exceed the value of test count x 10 minutes, it would be better to specify as follows.
+
+```
+./magicpod-api-client batch-run -p <project_1> -S <test_settings_number_1> -w <seconds to wait> &
+PID1=$!
+```
+
+See the details.
+
+```
+./magicpod-api-client batch-run --help
+```
+
 ## Build from source
 
 Run the following in the top directory of this repository.
