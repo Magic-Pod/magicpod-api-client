@@ -317,7 +317,7 @@ func commonFlags() []cli.Flag {
 		},
 		cli.StringFlag{
 			Name:  "http_headers, H",
-			Usage: "Additional HTTP headers in JSON string format(e.g.: '{"accept-language":"ja"}')",
+			Usage: "Additional HTTP headers in JSON string format (e.g.: '{\"accept-language\":\"ja\"}')",
 		},
 	}
 }
