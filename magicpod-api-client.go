@@ -12,7 +12,7 @@ import (
 
 func main() {
 	app := cli.NewApp()
-	app.Version = "0.99.24.1"
+	app.Version = "0.99.32.1"
 	app.Name = "magicpod-api-client"
 	app.Usage = "Simple and useful wrapper for MagicPod Web API"
 	app.Flags = []cli.Flag{
