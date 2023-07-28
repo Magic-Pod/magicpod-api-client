@@ -25,10 +25,10 @@ type BatchRun struct {
 	StartedAt        string `json:"started_at"`
 	FinishedAt       string `json:"finished_at"`
 	TestCases        struct {
-		Succeeded  int `json:"succeeded"`
-		Failed     int `json:"failed"`
-		Aborted    int `json:"aborted"`
-		Unresolved int `json:"unresolved"`
+		Succeeded  int `json:"succeeded,omitempty"`
+		Failed     int `json:"failed,omitempty"`
+		Aborted    int `json:"aborted,omitempty"`
+		Unresolved int `json:"unresolved,omitempty"`
 		Total      int `json:"total"`
 		Details    []struct {
 			PatternName    *string    `json:"pattern_name"`
