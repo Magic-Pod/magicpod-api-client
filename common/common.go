@@ -16,10 +16,10 @@ import (
 
 // BatchRun stands for a batch run executed on the server
 type BatchRun struct {
-	Url              string
-	Status           string
-	Batch_Run_Number int
-	Test_Cases       struct {
+	Url            string
+	Status         string
+	BatchRunNumber int
+	TestCases      struct {
 		Succeeded  int
 		Failed     int
 		Aborted    int
@@ -30,12 +30,12 @@ type BatchRun struct {
 
 // BatchRuns stands for a group of batch runs executed on the server
 type BatchRuns struct {
-	Batch_Runs []BatchRun
+	BatchRuns []BatchRun
 }
 
 // UploadFile stands for a file to be uploaded to the server
 type UploadFile struct {
-	File_No int
+	FileNo int
 }
 
 func zipAppDir(dirPath string) string {
@@ -95,7 +95,7 @@ func UploadApp(urlBase string, apiToken string, organization string, project str
 	if exitErr := handleError(res); exitErr != nil {
 		return 0, exitErr
 	}
-	return res.Result().(*UploadFile).File_No, nil
+	return res.Result().(*UploadFile).FileNo, nil
 }
 
 func mergeTestSettingsNumberToSetting(testSettingsMap map[string]interface{}, hasTestSettings bool, testSettingsNumber int) string {
@@ -205,11 +205,11 @@ func LatestBatchRunNo(urlBase string, apiToken string, organization string, proj
 	if exitErr := handleError(res); exitErr != nil {
 		return 0, exitErr
 	}
-	batchRuns := res.Result().(*BatchRuns).Batch_Runs
+	batchRuns := res.Result().(*BatchRuns).BatchRuns
 	if len(batchRuns) == 0 {
 		return 0, cli.NewExitError("no batch run exists in this project", 1)
 	}
-	return batchRuns[0].Batch_Run_Number, nil
+	return batchRuns[0].BatchRunNumber, nil
 }
 
 // DeleteApp deletes app/ipa/apk file on the server
@@ -364,7 +364,7 @@ func WaitForBatchRunResult(urlBase string, apiToken string, organization string,
 	httpHeadersMap map[string]string, batchRun *BatchRun,
 	waitLimit int, printResult bool) (*BatchRun /*on which magicpod bitrise step depends */, bool, bool, *cli.ExitError) {
 
-	crossBatchRunTotalTestCount := batchRun.Test_Cases.Total
+	crossBatchRunTotalTestCount := batchRun.TestCases.Total
 	const initRetryInterval = 10 // retry more frequently at first
 	const retryInterval = 60
 	var limitSeconds int
@@ -376,10 +376,10 @@ func WaitForBatchRunResult(urlBase string, apiToken string, organization string,
 	passedSeconds := 0
 	existsErr := false
 	existsUnresolved := false
-	printMessage(printResult, "\n#%d wait until %d tests to be finished.. \n", batchRun.Batch_Run_Number, batchRun.Test_Cases.Total)
+	printMessage(printResult, "\n#%d wait until %d tests to be finished.. \n", batchRun.BatchRunNumber, batchRun.TestCases.Total)
 	prevFinished := 0
 	for {
-		batchRunUnderProgress, exitErr := GetBatchRun(urlBase, apiToken, organization, project, httpHeadersMap, batchRun.Batch_Run_Number)
+		batchRunUnderProgress, exitErr := GetBatchRun(urlBase, apiToken, organization, project, httpHeadersMap, batchRun.BatchRunNumber)
 		if exitErr != nil {
 			if printResult {
 				fmt.Print(exitErr)
@@ -387,47 +387,47 @@ func WaitForBatchRunResult(urlBase string, apiToken string, organization string,
 			existsErr = true
 			break // give up the wait here
 		}
-		finished := batchRunUnderProgress.Test_Cases.Succeeded + batchRunUnderProgress.Test_Cases.Failed + batchRunUnderProgress.Test_Cases.Aborted + batchRunUnderProgress.Test_Cases.Unresolved
+		finished := batchRunUnderProgress.TestCases.Succeeded + batchRunUnderProgress.TestCases.Failed + batchRunUnderProgress.TestCases.Aborted + batchRunUnderProgress.TestCases.Unresolved
 		printMessage(printResult, ".") // show progress to prevent "long time no output" error on CircleCI etc
 		// output progress
 		if finished != prevFinished {
 			notSuccessfulCount := ""
-			if batchRunUnderProgress.Test_Cases.Failed > 0 {
-				notSuccessfulCount = fmt.Sprintf("%d failed", batchRunUnderProgress.Test_Cases.Failed)
+			if batchRunUnderProgress.TestCases.Failed > 0 {
+				notSuccessfulCount = fmt.Sprintf("%d failed", batchRunUnderProgress.TestCases.Failed)
 			}
-			if batchRunUnderProgress.Test_Cases.Unresolved > 0 {
+			if batchRunUnderProgress.TestCases.Unresolved > 0 {
 				if notSuccessfulCount != "" {
 					notSuccessfulCount += ", "
 				}
-				notSuccessfulCount += fmt.Sprintf("%d unresolved", batchRunUnderProgress.Test_Cases.Unresolved)
+				notSuccessfulCount += fmt.Sprintf("%d unresolved", batchRunUnderProgress.TestCases.Unresolved)
 			}
 			if notSuccessfulCount != "" {
 				notSuccessfulCount = fmt.Sprintf(" (%s)", notSuccessfulCount)
 			}
-			printMessage(printResult, "%d/%d finished%s\n", finished, batchRun.Test_Cases.Total, notSuccessfulCount)
+			printMessage(printResult, "%d/%d finished%s\n", finished, batchRun.TestCases.Total, notSuccessfulCount)
 			prevFinished = finished
 		}
 		if batchRunUnderProgress.Status != "running" {
-			if batchRunUnderProgress.Test_Cases.Unresolved > 0 {
+			if batchRunUnderProgress.TestCases.Unresolved > 0 {
 				existsUnresolved = true
 			}
 			if batchRunUnderProgress.Status == "succeeded" {
 				printMessage(printResult, "batch run succeeded\n")
 				break
 			} else if batchRunUnderProgress.Status == "failed" {
-				if batchRunUnderProgress.Test_Cases.Failed > 0 {
+				if batchRunUnderProgress.TestCases.Failed > 0 {
 					unresolved := ""
 					if existsUnresolved {
-						unresolved = fmt.Sprintf(", %d unresolved", batchRunUnderProgress.Test_Cases.Unresolved)
+						unresolved = fmt.Sprintf(", %d unresolved", batchRunUnderProgress.TestCases.Unresolved)
 					}
-					printMessage(printResult, "batch run failed (%d failed%s)\n", batchRunUnderProgress.Test_Cases.Failed, unresolved)
+					printMessage(printResult, "batch run failed (%d failed%s)\n", batchRunUnderProgress.TestCases.Failed, unresolved)
 				} else {
 					printMessage(printResult, "batch run failed\n")
 				}
 				existsErr = true
 				break
 			} else if batchRunUnderProgress.Status == "unresolved" {
-				printMessage(printResult, "batch run unresolved (%d unresolved)\n", batchRunUnderProgress.Test_Cases.Unresolved)
+				printMessage(printResult, "batch run unresolved (%d unresolved)\n", batchRunUnderProgress.TestCases.Unresolved)
 				break
 			} else if batchRunUnderProgress.Status == "aborted" {
 				printMessage(printResult, "batch run aborted\n")
