@@ -16,16 +16,44 @@ import (
 
 // BatchRun stands for a batch run executed on the server
 type BatchRun struct {
-	Url            string
-	Status         string
-	BatchRunNumber int
-	TestCases      struct {
-		Succeeded  int
-		Failed     int
-		Aborted    int
-		Unresolved int
-		Total      int
-	}
+	OrganizationName string `json:"organization_name"`
+	ProjectName      string `json:"project_name"`
+	BatchRunNumber   int    `json:"batch_run_number"`
+	TestSettingName  string `json:"test_setting_name"`
+	Status           string `json:"status"`
+	StatusNumber     int    `json:"status_number"`
+	StartedAt        string `json:"started_at"`
+	FinishedAt       string `json:"finished_at"`
+	TestCases        struct {
+		Succeeded  int `json:"succeeded"`
+		Failed     int `json:"failed"`
+		Aborted    int `json:"aborted"`
+		Unresolved int `json:"unresolved"`
+		Total      int `json:"total"`
+		Details    []struct {
+			PatternName    string     `json:"pattern_name"`
+			IncludedLabels []string   `json:"included_labels"`
+			ExcludedLabels []string   `json:"excluded_labels"`
+			Results        []TestCase `json:"results"`
+		} `json:"details"`
+	} `json:"test_cases"`
+	Url string `json:"url"`
+}
+
+type TestCase struct {
+	Order        int           `json:"order"`
+	Number       int           `json:"number"`
+	Status       string        `json:"status"`
+	StartedAt    string        `json:"started_at"`
+	FinishedAt   string        `json:"finished_at"`
+	DataPatterns []DataPattern `json:"data_patterns"`
+}
+
+type DataPattern struct {
+	DataIndex  int    `json:"data_index"`
+	Status     string `json:"status"`
+	StartedAt  string `json:"started_at"`
+	FinishedAt string `json:"finished_at"`
 }
 
 // BatchRuns stands for a group of batch runs executed on the server
