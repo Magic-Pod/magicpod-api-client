@@ -48,6 +48,17 @@ func main() {
 			Action: batchRunAction,
 		},
 		{
+			Name:  "get-batch-run",
+			Usage: "Get batch run result",
+			Flags: append(commonFlags(), []cli.Flag{
+				cli.IntFlag{
+					Name:  "batch_run_number, b",
+					Usage: "Batch run number",
+				},
+			}...),
+			Action: getBatchRunAction,
+		},
+		{
 			Name:   "latest-batch-run-no",
 			Usage:  "Get the latest batch run number",
 			Flags:  commonFlags(),
@@ -131,6 +142,28 @@ func main() {
 		},
 	}
 	app.Run(os.Args)
+}
+
+func getBatchRunAction(c *cli.Context) error {
+	urlBase, apiToken, organization, project, httpHeadersMap, err := parseCommonFlags(c)
+	if err != nil {
+		return err
+	}
+
+	batchRunNumber := c.Int("batch_run_number")
+	if batchRunNumber == 0 {
+		return cli.NewExitError("--batch_run_number option is not specified or 0", 1)
+	}
+	batchRun, exitErr := common.GetBatchRun(urlBase, apiToken, organization, project, httpHeadersMap, batchRunNumber)
+	if exitErr != nil {
+		return exitErr
+	}
+	b, err := json.Marshal(batchRun)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(b))
+	return nil
 }
 
 func latestBatchRunNoAction(c *cli.Context) error {
