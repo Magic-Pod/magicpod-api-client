@@ -25,6 +25,8 @@ type BatchRun struct {
 	StartedAt        string `json:"started_at"`
 	FinishedAt       string `json:"finished_at"`
 	TestCases        struct {
+		NotRunning int `json:"not-running,omitempty"`
+		Running    int `json:"running,omitempty"`
 		Succeeded  int `json:"succeeded,omitempty"`
 		Failed     int `json:"failed,omitempty"`
 		Aborted    int `json:"aborted,omitempty"`
