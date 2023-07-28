@@ -31,7 +31,7 @@ type BatchRun struct {
 		Unresolved int `json:"unresolved"`
 		Total      int `json:"total"`
 		Details    []struct {
-			PatternName    string     `json:"pattern_name"`
+			PatternName    *string    `json:"pattern_name"`
 			IncludedLabels []string   `json:"included_labels"`
 			ExcludedLabels []string   `json:"excluded_labels"`
 			Results        []TestCase `json:"results"`
@@ -42,7 +42,7 @@ type BatchRun struct {
 
 type TestCase struct {
 	Order        int           `json:"order"`
-	Number       int           `json:"number"`
+	Number       *int          `json:"number"`
 	Status       string        `json:"status"`
 	StartedAt    string        `json:"started_at"`
 	FinishedAt   string        `json:"finished_at"`
