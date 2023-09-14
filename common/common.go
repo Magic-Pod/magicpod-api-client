@@ -228,6 +228,28 @@ func GetBatchRun(urlBase string, apiToken string, organization string, project s
 	return res.Result().(*BatchRun), nil
 }
 
+func GetBatchRuns(urlBase string, apiToken string, organization string, project string, httpHeadersMap map[string]string, count int, maxBatchRunNumber int, minBatchRunNumber int) (*BatchRuns, *cli.ExitError) {
+	req := createBaseRequest(urlBase, apiToken, organization, project, httpHeadersMap).
+		SetQueryParam("count", strconv.Itoa(count)).
+		SetResult(BatchRuns{})
+	// Optional filtering parameters.
+	if maxBatchRunNumber > 0 {
+		req.SetQueryParam("max_batch_run_number", strconv.Itoa(maxBatchRunNumber))
+	}
+	if minBatchRunNumber > 0 {
+		req.SetQueryParam("min_batch_run_number", strconv.Itoa(minBatchRunNumber))
+	}
+
+	res, err := req.Get("/{organization}/{project}/batch-runs/")
+	if err != nil {
+		panic(err)
+	}
+	if exitErr := handleError(res); exitErr != nil {
+		return nil, exitErr
+	}
+	return res.Result().(*BatchRuns), nil
+}
+
 func LatestBatchRunNo(urlBase string, apiToken string, organization string, project string, httpHeadersMap map[string]string) (int, *cli.ExitError) {
 	res, err := createBaseRequest(urlBase, apiToken, organization, project, httpHeadersMap).
 		SetQueryParam("count", "1").
