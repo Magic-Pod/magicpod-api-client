@@ -64,7 +64,28 @@ type DataPattern struct {
 
 // BatchRuns stands for a group of batch runs executed on the server
 type BatchRuns struct {
-	BatchRuns []BatchRun
+	OrganizationName string            `json:"organization_name"`
+	ProjectName      string            `json:"project_name"`
+	BatchRuns        []BatchRunSummary `json:"batch_runs"`
+}
+
+type BatchRunSummary struct {
+	BatchRunNumber  int    `json:"batch_run_number"`
+	TestSettingName string `json:"test_setting_name"`
+	Status          string `json:"status"`
+	StatusNumber    int    `json:"status_number"`
+	StartedAt       string `json:"started_at"`
+	FinishedAt      string `json:"finished_at"`
+	TestCases       struct {
+		NotRunning int `json:"not-running,omitempty"`
+		Running    int `json:"running,omitempty"`
+		Succeeded  int `json:"succeeded,omitempty"`
+		Failed     int `json:"failed,omitempty"`
+		Aborted    int `json:"aborted,omitempty"`
+		Unresolved int `json:"unresolved,omitempty"`
+		Total      int `json:"total"`
+	} `json:"test_cases"`
+	Url string `json:"url"`
 }
 
 // UploadFile stands for a file to be uploaded to the server
