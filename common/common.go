@@ -14,6 +14,16 @@ import (
 	"github.com/urfave/cli"
 )
 
+type testCasesCounter struct {
+	NotRunning int `json:"not-running,omitempty"`
+	Running    int `json:"running,omitempty"`
+	Succeeded  int `json:"succeeded,omitempty"`
+	Failed     int `json:"failed,omitempty"`
+	Aborted    int `json:"aborted,omitempty"`
+	Unresolved int `json:"unresolved,omitempty"`
+	Total      int `json:"total"`
+}
+
 // BatchRun stands for a batch run executed on the server
 type BatchRun struct {
 	OrganizationName string `json:"organization_name"`
@@ -25,14 +35,8 @@ type BatchRun struct {
 	StartedAt        string `json:"started_at"`
 	FinishedAt       string `json:"finished_at"`
 	TestCases        struct {
-		NotRunning int `json:"not-running,omitempty"`
-		Running    int `json:"running,omitempty"`
-		Succeeded  int `json:"succeeded,omitempty"`
-		Failed     int `json:"failed,omitempty"`
-		Aborted    int `json:"aborted,omitempty"`
-		Unresolved int `json:"unresolved,omitempty"`
-		Total      int `json:"total"`
-		Details    []struct {
+		testCasesCounter
+		Details []struct {
 			PatternName    *string          `json:"pattern_name"`
 			IncludedLabels []string         `json:"included_labels"`
 			ExcludedLabels []string         `json:"excluded_labels"`
@@ -77,13 +81,7 @@ type BatchRunSummary struct {
 	StartedAt       string `json:"started_at"`
 	FinishedAt      string `json:"finished_at"`
 	TestCases       struct {
-		NotRunning int `json:"not-running,omitempty"`
-		Running    int `json:"running,omitempty"`
-		Succeeded  int `json:"succeeded,omitempty"`
-		Failed     int `json:"failed,omitempty"`
-		Aborted    int `json:"aborted,omitempty"`
-		Unresolved int `json:"unresolved,omitempty"`
-		Total      int `json:"total"`
+		testCasesCounter
 	} `json:"test_cases"`
 	Url string `json:"url"`
 }
