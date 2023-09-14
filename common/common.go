@@ -25,8 +25,9 @@ type testCasesCounter struct {
 }
 
 type taskInterval struct {
-	StartedAt  string `json:"started_at"`
-	FinishedAt string `json:"finished_at"`
+	StartedAt       string   `json:"started_at"`
+	FinishedAt      string   `json:"finished_at"`
+	DurationSeconds *float64 `json:"duration_seconds"`
 }
 
 // BatchRun stands for a batch run executed on the server
