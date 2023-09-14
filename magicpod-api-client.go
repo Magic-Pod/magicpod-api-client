@@ -59,6 +59,28 @@ func main() {
 			Action: getBatchRunAction,
 		},
 		{
+			Name:  "get-batch-runs",
+			Usage: "Get the batch runs information in the **most recent first** order.",
+			Flags: append(commonFlags(), []cli.Flag{
+				cli.IntFlag{
+					Name:  "count, c",
+					Usage: "The maximum number of records to retrieve.",
+					Value: 20,
+				},
+				cli.IntFlag{
+					Name:     "max_batch_run_number, max",
+					Usage:    "The most recent batch run number to start retrieving records from.",
+					Required: false,
+				},
+				cli.IntFlag{
+					Name:     "min_batch_run_number, min",
+					Usage:    "The least recent batch run number to stop retrieving records at.",
+					Required: false,
+				},
+			}...),
+			Action: getBatchRunsAction,
+		},
+		{
 			Name:   "latest-batch-run-no",
 			Usage:  "Get the latest batch run number",
 			Flags:  commonFlags(),
@@ -163,6 +185,10 @@ func getBatchRunAction(c *cli.Context) error {
 		return err
 	}
 	fmt.Println(string(b))
+	return nil
+}
+
+func getBatchRunsAction(c *cli.Context) error {
 	return nil
 }
 
