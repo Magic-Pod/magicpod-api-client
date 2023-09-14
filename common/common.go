@@ -44,7 +44,6 @@ type BatchRun struct {
 
 type TestCase struct {
 	Order        int           `json:"order"`
-	Number       *int          `json:"number"`
 	Status       string        `json:"status"`
 	StartedAt    string        `json:"started_at"`
 	FinishedAt   string        `json:"finished_at"`
