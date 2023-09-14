@@ -189,6 +189,23 @@ func getBatchRunAction(c *cli.Context) error {
 }
 
 func getBatchRunsAction(c *cli.Context) error {
+	urlBase, apiToken, organization, project, httpHeadersMap, err := parseCommonFlags(c)
+	if err != nil {
+		return err
+	}
+
+	count := c.Int("count")
+	maxBatchRunNumber := c.Int("max_batch_run_number")
+	minBatchRunNumber := c.Int("min_batch_run_number")
+	batchRuns, exitErr := common.GetBatchRuns(urlBase, apiToken, organization, project, httpHeadersMap, count, maxBatchRunNumber, minBatchRunNumber)
+	if exitErr != nil {
+		return exitErr
+	}
+	b, err := json.Marshal(batchRuns)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(b))
 	return nil
 }
 
