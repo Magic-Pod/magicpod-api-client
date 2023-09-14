@@ -24,6 +24,11 @@ type testCasesCounter struct {
 	Total      int `json:"total"`
 }
 
+type taskInterval struct {
+	StartedAt  string `json:"started_at"`
+	FinishedAt string `json:"finished_at"`
+}
+
 // BatchRun stands for a batch run executed on the server
 type BatchRun struct {
 	OrganizationName string `json:"organization_name"`
@@ -32,9 +37,8 @@ type BatchRun struct {
 	TestSettingName  string `json:"test_setting_name"`
 	Status           string `json:"status"`
 	StatusNumber     int    `json:"status_number"`
-	StartedAt        string `json:"started_at"`
-	FinishedAt       string `json:"finished_at"`
-	TestCases        struct {
+	taskInterval
+	TestCases struct {
 		testCasesCounter
 		Details []struct {
 			PatternName    *string          `json:"pattern_name"`
@@ -53,9 +57,8 @@ type TestCaseResult struct {
 		Name   string `json:"name"`
 		Url    string `json:"url"`
 	} `json:"test_case"`
-	Status       string        `json:"status"`
-	StartedAt    string        `json:"started_at"`
-	FinishedAt   string        `json:"finished_at"`
+	Status string `json:"status"`
+	taskInterval
 	DataPatterns []DataPattern `json:"data_patterns"`
 }
 
@@ -78,9 +81,8 @@ type BatchRunSummary struct {
 	TestSettingName string `json:"test_setting_name"`
 	Status          string `json:"status"`
 	StatusNumber    int    `json:"status_number"`
-	StartedAt       string `json:"started_at"`
-	FinishedAt      string `json:"finished_at"`
-	TestCases       struct {
+	taskInterval
+	TestCases struct {
 		testCasesCounter
 	} `json:"test_cases"`
 	Url string `json:"url"`
