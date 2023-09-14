@@ -33,16 +33,16 @@ type BatchRun struct {
 		Unresolved int `json:"unresolved,omitempty"`
 		Total      int `json:"total"`
 		Details    []struct {
-			PatternName    *string    `json:"pattern_name"`
-			IncludedLabels []string   `json:"included_labels"`
-			ExcludedLabels []string   `json:"excluded_labels"`
-			Results        []TestCase `json:"results"`
+			PatternName    *string          `json:"pattern_name"`
+			IncludedLabels []string         `json:"included_labels"`
+			ExcludedLabels []string         `json:"excluded_labels"`
+			Results        []TestCaseResult `json:"results"`
 		} `json:"details"`
 	} `json:"test_cases"`
 	Url string `json:"url"`
 }
 
-type TestCase struct {
+type TestCaseResult struct {
 	Order        int           `json:"order"`
 	Status       string        `json:"status"`
 	StartedAt    string        `json:"started_at"`
