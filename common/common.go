@@ -14,6 +14,16 @@ import (
 	"github.com/urfave/cli"
 )
 
+type testCasesCounter struct {
+	NotRunning int `json:"not-running,omitempty"`
+	Running    int `json:"running,omitempty"`
+	Succeeded  int `json:"succeeded,omitempty"`
+	Failed     int `json:"failed,omitempty"`
+	Aborted    int `json:"aborted,omitempty"`
+	Unresolved int `json:"unresolved,omitempty"`
+	Total      int `json:"total"`
+}
+
 // BatchRun stands for a batch run executed on the server
 type BatchRun struct {
 	OrganizationName string `json:"organization_name"`
@@ -25,14 +35,8 @@ type BatchRun struct {
 	StartedAt        string `json:"started_at"`
 	FinishedAt       string `json:"finished_at"`
 	TestCases        struct {
-		NotRunning int `json:"not-running,omitempty"`
-		Running    int `json:"running,omitempty"`
-		Succeeded  int `json:"succeeded,omitempty"`
-		Failed     int `json:"failed,omitempty"`
-		Aborted    int `json:"aborted,omitempty"`
-		Unresolved int `json:"unresolved,omitempty"`
-		Total      int `json:"total"`
-		Details    []struct {
+		testCasesCounter
+		Details []struct {
 			PatternName    *string          `json:"pattern_name"`
 			IncludedLabels []string         `json:"included_labels"`
 			ExcludedLabels []string         `json:"excluded_labels"`
@@ -64,7 +68,22 @@ type DataPattern struct {
 
 // BatchRuns stands for a group of batch runs executed on the server
 type BatchRuns struct {
-	BatchRuns []BatchRun
+	OrganizationName string            `json:"organization_name"`
+	ProjectName      string            `json:"project_name"`
+	BatchRuns        []BatchRunSummary `json:"batch_runs"`
+}
+
+type BatchRunSummary struct {
+	BatchRunNumber  int    `json:"batch_run_number"`
+	TestSettingName string `json:"test_setting_name"`
+	Status          string `json:"status"`
+	StatusNumber    int    `json:"status_number"`
+	StartedAt       string `json:"started_at"`
+	FinishedAt      string `json:"finished_at"`
+	TestCases       struct {
+		testCasesCounter
+	} `json:"test_cases"`
+	Url string `json:"url"`
 }
 
 // UploadFile stands for a file to be uploaded to the server
@@ -228,11 +247,33 @@ func GetBatchRun(urlBase string, apiToken string, organization string, project s
 	return res.Result().(*BatchRun), nil
 }
 
+func getBatchRuns(urlBase string, apiToken string, organization string, project string, httpHeadersMap map[string]string, count int, maxBatchRunNumber int, minBatchRunNumber int) (*resty.Response, error) {
+	req := createBaseRequest(urlBase, apiToken, organization, project, httpHeadersMap).
+		SetQueryParam("count", strconv.Itoa(count)).
+		SetResult(BatchRuns{})
+	// Optional filtering parameters.
+	if maxBatchRunNumber > 0 {
+		req.SetQueryParam("max_batch_run_number", strconv.Itoa(maxBatchRunNumber))
+	}
+	if minBatchRunNumber > 0 {
+		req.SetQueryParam("min_batch_run_number", strconv.Itoa(minBatchRunNumber))
+	}
+	return req.Get("/{organization}/{project}/batch-runs/")
+}
+
+func GetBatchRuns(urlBase string, apiToken string, organization string, project string, httpHeadersMap map[string]string, count int, maxBatchRunNumber int, minBatchRunNumber int) (*BatchRuns, *cli.ExitError) {
+	res, err := getBatchRuns(urlBase, apiToken, organization, project, httpHeadersMap, count, maxBatchRunNumber, minBatchRunNumber)
+	if err != nil {
+		panic(err)
+	}
+	if exitErr := handleError(res); exitErr != nil {
+		return nil, exitErr
+	}
+	return res.Result().(*BatchRuns), nil
+}
+
 func LatestBatchRunNo(urlBase string, apiToken string, organization string, project string, httpHeadersMap map[string]string) (int, *cli.ExitError) {
-	res, err := createBaseRequest(urlBase, apiToken, organization, project, httpHeadersMap).
-		SetQueryParam("count", "1").
-		SetResult(BatchRuns{}).
-		Get("/{organization}/{project}/batch-runs/")
+	res, err := getBatchRuns(urlBase, apiToken, organization, project, httpHeadersMap, 1, 0, 0)
 	if err != nil {
 		panic(err)
 	}

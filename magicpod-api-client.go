@@ -59,6 +59,28 @@ func main() {
 			Action: getBatchRunAction,
 		},
 		{
+			Name:  "get-batch-runs",
+			Usage: "Get the batch runs information in the **most recent first** order.",
+			Flags: append(commonFlags(), []cli.Flag{
+				cli.IntFlag{
+					Name:  "count, c",
+					Usage: "The maximum number of records to retrieve.",
+					Value: 20,
+				},
+				cli.IntFlag{
+					Name:     "max_batch_run_number, max",
+					Usage:    "The most recent batch run number to start retrieving records from.",
+					Required: false,
+				},
+				cli.IntFlag{
+					Name:     "min_batch_run_number, min",
+					Usage:    "The least recent batch run number to stop retrieving records at.",
+					Required: false,
+				},
+			}...),
+			Action: getBatchRunsAction,
+		},
+		{
 			Name:   "latest-batch-run-no",
 			Usage:  "Get the latest batch run number",
 			Flags:  commonFlags(),
@@ -159,6 +181,30 @@ func getBatchRunAction(c *cli.Context) error {
 		return exitErr
 	}
 	b, err := json.Marshal(batchRun)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(b))
+	return nil
+}
+
+func getBatchRunsAction(c *cli.Context) error {
+	urlBase, apiToken, organization, project, httpHeadersMap, err := parseCommonFlags(c)
+	if err != nil {
+		return err
+	}
+
+	count := c.Int("count")
+	maxBatchRunNumber := c.Int("max_batch_run_number")
+	minBatchRunNumber := c.Int("min_batch_run_number")
+	if maxBatchRunNumber != 0 && minBatchRunNumber != 0 && maxBatchRunNumber < minBatchRunNumber {
+		return cli.NewExitError("--max_batch_run_number value is smaller than --min_batch_run_number value", 1)
+	}
+	batchRuns, exitErr := common.GetBatchRuns(urlBase, apiToken, organization, project, httpHeadersMap, count, maxBatchRunNumber, minBatchRunNumber)
+	if exitErr != nil {
+		return exitErr
+	}
+	b, err := json.Marshal(batchRuns)
 	if err != nil {
 		return err
 	}
