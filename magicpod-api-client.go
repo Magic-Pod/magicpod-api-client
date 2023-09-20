@@ -197,7 +197,7 @@ func getBatchRunsAction(c *cli.Context) error {
 	count := c.Int("count")
 	maxBatchRunNumber := c.Int("max_batch_run_number")
 	minBatchRunNumber := c.Int("min_batch_run_number")
-	if maxBatchRunNumber < minBatchRunNumber {
+	if maxBatchRunNumber != 0 && minBatchRunNumber != 0 && maxBatchRunNumber < minBatchRunNumber {
 		return cli.NewExitError("--max_batch_run_number value is smaller than --min_batch_run_number value", 1)
 	}
 	batchRuns, exitErr := common.GetBatchRuns(urlBase, apiToken, organization, project, httpHeadersMap, count, maxBatchRunNumber, minBatchRunNumber)
