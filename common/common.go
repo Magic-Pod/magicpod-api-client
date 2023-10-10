@@ -91,7 +91,7 @@ type BatchRunSummary struct {
 
 // UploadFile stands for a file to be uploaded to the server
 type UploadFile struct {
-	FileNo int
+	FileNo int `json:"file_no"`
 }
 
 func zipAppDir(dirPath string) string {
