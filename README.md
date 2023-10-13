@@ -103,8 +103,10 @@ The following is the script to generate 64 bit executables and zip files for Mac
 
 ```
 # Mac64
-GOOS=darwin GOARCH=amd64 go build -o out/mac64/magicpod-api-client
-zip -jq out/mac64_magicpod-api-client.zip out/mac64/magicpod-api-client
+GOOS=darwin GOARCH=amd64 go build -o out/mac64/magicpod-api-client.amd64
+GOOS=darwin GOARCH=arm64 go build -o out/mac64/magicpod-api-client.arm64
+lipo -create -output out/mac64/magicpod-api-client out/mac64/magicpod-api-client.amd64 out/mac64/magicpod-api-client.arm64
+zip -jq out/magicpod-api-client.zip out/mac64/magicpod-api-client
 
 # Linux64
 GOOS=linux GOARCH=amd64 go build -o out/linux64/magicpod-api-client
@@ -140,8 +142,10 @@ The basic procedures are as follows.
 The following is an example script.
 
 ```sh
-# Build a macOS binary.
-GOOS=darwin GOARCH=amd64 go build -o out/mac64/magicpod-api-client
+# Build a universal macOS binary.
+GOOS=darwin GOARCH=amd64 go build -o out/mac64/magicpod-api-client.amd64
+GOOS=darwin GOARCH=arm64 go build -o out/mac64/magicpod-api-client.arm64
+lipo -create -output out/mac64/magicpod-api-client out/mac64/magicpod-api-client.amd64 out/mac64/magicpod-api-client.arm64
 
 # Code-sign the binary.
 codesign -s <certificate name> -v --timestamp --options runtime out/mac64/magicpod-api-client
