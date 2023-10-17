@@ -1,0 +1,58 @@
+name: 🐞 不具合報告
+description: 不具合を報告する
+title: 'bug: <タイトル>'
+body:
+  - type: textarea
+    attributes:
+      label: '発生した事象'
+      description: '発生した事象の内容を記述してください。 **ログはここに貼らないようにしてください** スクリーンショットはウェルカムです'
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: '期待する振る舞い'
+      description: '期待する振る舞いを記述してください'
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 'エラーログ'
+      description: | 
+        エラーログがあればここに貼ってください
+    validations:
+      required: false
+  - type: dropdown
+    attributes:
+      label: '再現率'
+      description: '問題の再現率を選択してください'
+      options:
+        - 常に起こる (100%)
+        - 頻繁に起こる (80%前後)
+        - 時々起こる (50%前後)
+        - たまに起こる (30%前後)
+        - まれに起こる (10%前後)
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: '再現手順'
+      description: |
+        再現手順があれば差し支えない範囲でここに貼ってください。再現率が100%でなくても大丈夫です。
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: '環境'
+      description: '実行環境等について教えてください。該当しない部分を消したり、足したりして頂いても問題ありません。'
+      value: |
+          - OS:
+          - 最後に動いていたバージョン(もしあれば): 
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: その他特筆事項
+      description: |
+        上記以外で追加のコンテキスト情報があれば記載頂けると幸いです。画像やログファイルなどでも問題ありません。
+    validations:
+      required: false
