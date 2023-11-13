@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/go-resty/resty"
-	"github.com/mholt/archiver"
+	"github.com/mholt/archiver/v3"
 	"github.com/urfave/cli"
 )
 
