@@ -112,6 +112,9 @@ zip -jq out/magicpod-api-client.zip out/mac64/magicpod-api-client
 GOOS=linux GOARCH=amd64 go build -o out/linux64/magicpod-api-client
 zip -jq out/linux64_magicpod-api-client.zip out/linux64/magicpod-api-client
 
+GOOS=linux GOARCH=arm64 go build -o out/linux64_arm64/magicpod-api-client
+zip -jq out/linux64_arm64_magicpod-api-client.zip out/linux64_arm64/magicpod-api-client
+
 # Win64
 GOOS=windows GOARCH=amd64 go build -o out/win64/magicpod-api-client.exe
 zip -jq out/win64_magicpod-api-client.exe.zip out/win64/magicpod-api-client.exe
