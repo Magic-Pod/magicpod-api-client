@@ -1,16 +1,18 @@
 package common
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/go-resty/resty"
-	"github.com/mholt/archiver/v3"
+	"github.com/mholt/archives"
 	"github.com/urfave/cli"
 )
 
@@ -95,13 +97,28 @@ type UploadFile struct {
 }
 
 func zipAppDir(dirPath string) string {
+	ctx := context.TODO()
+
+	files, err := archives.FilesFromDisk(ctx, nil, map[string]string{
+		dirPath: filepath.Base(dirPath),
+	})
+	if err != nil {
+		panic(err)
+	}
+
 	zipPath := dirPath + ".zip"
-	if err := os.RemoveAll(zipPath); err != nil {
+	zipFile, err := os.Create(zipPath)
+	if err != nil {
 		panic(err)
 	}
-	if err := archiver.Archive([]string{dirPath}, zipPath); err != nil {
+	defer zipFile.Close()
+
+	zip := archives.Zip{}
+	err = zip.Archive(context.TODO(), zipFile, files);
+	if err != nil {
 		panic(err)
 	}
+
 	return zipPath
 }
 
