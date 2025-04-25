@@ -1,6 +1,8 @@
 module github.com/Magic-Pod/magicpod-api-client
 
-go 1.22.2
+go 1.23.0
+
+toolchain go1.24.2
 
 require (
 	github.com/go-resty/resty v0.0.0-00010101000000-000000000000
@@ -30,8 +32,8 @@ require (
 	github.com/therootcompany/xz v1.0.1 // indirect
 	github.com/ulikunitz/xz v0.5.12 // indirect
 	go4.org v0.0.0-20230225012048-214862532bf5 // indirect
-	golang.org/x/net v0.17.0 // indirect
-	golang.org/x/text v0.20.0 // indirect
+	golang.org/x/net v0.38.0 // indirect
+	golang.org/x/text v0.23.0 // indirect
 	gopkg.in/resty.v1 v1.12.0 // indirect
 )
 
