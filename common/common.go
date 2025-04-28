@@ -114,7 +114,7 @@ func zipAppDir(dirPath string) string {
 	defer zipFile.Close()
 
 	zip := archives.Zip{}
-	err = zip.Archive(context.TODO(), zipFile, files);
+	err = zip.Archive(ctx, zipFile, files);
 	if err != nil {
 		panic(err)
 	}
