@@ -1,6 +1,7 @@
 package common
 
 import (
+	"archive/zip"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -113,8 +114,10 @@ func zipAppDir(dirPath string) string {
 	}
 	defer zipFile.Close()
 
-	zip := archives.Zip{}
-	err = zip.Archive(ctx, zipFile, files);
+	zip := archives.Zip{
+		Compression: zip.Deflate,
+	}
+	err = zip.Archive(ctx, zipFile, files)
 	if err != nil {
 		panic(err)
 	}
