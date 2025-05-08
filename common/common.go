@@ -113,7 +113,10 @@ func zipAppDir(dirPath string) string {
 	}
 	defer zipFile.Close()
 
-	zip := archives.Zip{}
+	zip := archives.CompressedArchive{
+		Compression: archives.Zstd{},
+		Archival: archives.Zip{},
+	}
 	err = zip.Archive(ctx, zipFile, files);
 	if err != nil {
 		panic(err)
