@@ -117,7 +117,7 @@ func zipAppDir(dirPath string) string {
 	zip := archives.Zip{
 		Compression: zip.Deflate,
 	}
-	err = zip.Archive(ctx, zipFile, files);
+	err = zip.Archive(ctx, zipFile, files)
 	if err != nil {
 		panic(err)
 	}
