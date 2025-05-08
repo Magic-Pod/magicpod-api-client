@@ -16,7 +16,7 @@ func TestZipAppDir(t *testing.T) {
 		t.Fatalf("Failed to read zip file: %v", err)
 	}
 
-	FILE_SIZE_THRESHOLD := int64(4300)
+	FILE_SIZE_THRESHOLD := int64(4400)
 	if fileInfo.Size() >= FILE_SIZE_THRESHOLD {
 		t.Errorf("Zip file size %d is larger than the threshold %d", fileInfo.Size(), FILE_SIZE_THRESHOLD)
 	}
