@@ -1,6 +1,7 @@
 package common
 
 import (
+	"archive/zip"
 	"os"
 	"testing"
 )
@@ -19,4 +20,10 @@ func TestZipAppDir(t *testing.T) {
 	if fileInfo.Size() >= FILE_SIZE_THRESHOLD {
 		t.Errorf("Zip file size %d is larger than original directory size %d", fileInfo.Size(), FILE_SIZE_THRESHOLD)
 	}
+
+	zip, err := zip.OpenReader(zipFile)
+	if err != nil {
+		t.Fatalf("Failed to open zip file: %v", err)
+	}
+	defer zip.Close()
 }
