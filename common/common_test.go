@@ -2,7 +2,9 @@ package common
 
 import (
 	"archive/zip"
+	"io"
 	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -29,4 +31,53 @@ func TestZipAppDirCompressed(t *testing.T) {
 		t.Errorf("Failed to open zip file: %v", err)
 	}
 	defer zip.Close()
+}
+
+// Verify that the symlink in the zip file points to the correct target
+func TestZipAppDirSymlink(t *testing.T) {
+	dirPath := "testdata/symlink"
+
+	// Action: Create a zip file from the directory
+	zipFile := zipAppDir(dirPath)
+	reader, err := zip.OpenReader(zipFile)
+	if err != nil {
+		t.Fatalf("Failed to open zip file: %v", err)
+	}
+	defer reader.Close()
+
+	for _, file := range reader.File {
+		if !isSymlink(file.FileInfo()) {
+			continue
+		}
+
+		rc, err := file.Open()
+		if err != nil {
+			t.Fatalf("Failed to open file in zip '%s': %v", file.Name, err)
+		}
+		defer rc.Close()
+
+		linkTargetBytes, err := io.ReadAll(rc)
+		if err != nil {
+			t.Fatalf("Failed to read symlink target from zip '%s': %v", file.Name, err)
+		}
+
+		zippedLinkPath := string(linkTargetBytes)
+
+		originalFilePath := filepath.Join(filepath.Dir(dirPath), file.Name)
+		originalFile, err := os.Open(originalFilePath)
+		if err != nil {
+			t.Fatalf("Failed to open original symlink: %v", err)
+		}
+		defer originalFile.Close()
+
+		originalLinkPath, err := os.Readlink(originalFilePath)
+		if err != nil {
+			t.Fatalf("Failed to read original symlink: %v", err)
+		}
+
+		// Assert: Check if the symlink in the zip file points to the correct target
+		if zippedLinkPath != originalLinkPath {
+			t.Errorf("Original symlink and zipped symlink do not match: %s != %s", originalLinkPath, zippedLinkPath)
+		}
+	}
 }

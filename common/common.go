@@ -97,6 +97,10 @@ type UploadFile struct {
 	FileNo int `json:"file_no"`
 }
 
+func isSymlink(fileInfo os.FileInfo) bool {
+	return fileInfo.Mode() & os.ModeSymlink != 0;
+}
+
 func zipAppDir(dirPath string) string {
 	ctx := context.TODO()
 
