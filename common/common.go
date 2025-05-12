@@ -2,9 +2,9 @@ package common
 
 import (
 	"archive/zip"
-	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/go-resty/resty"
-	"github.com/mholt/archives"
 	"github.com/urfave/cli"
 )
 
@@ -102,15 +101,6 @@ func isSymlink(fileInfo os.FileInfo) bool {
 }
 
 func zipAppDir(dirPath string) string {
-	ctx := context.TODO()
-
-	files, err := archives.FilesFromDisk(ctx, nil, map[string]string{
-		dirPath: filepath.Base(dirPath),
-	})
-	if err != nil {
-		panic(err)
-	}
-
 	zipPath := dirPath + ".zip"
 	zipFile, err := os.Create(zipPath)
 	if err != nil {
@@ -118,10 +108,79 @@ func zipAppDir(dirPath string) string {
 	}
 	defer zipFile.Close()
 
-	zip := archives.Zip{
-		Compression: zip.Deflate,
-	}
-	err = zip.Archive(ctx, zipFile, files)
+	zipWriter := zip.NewWriter(zipFile)
+	defer zipWriter.Close()
+
+	err = filepath.WalkDir(dirPath, func(filePath string, dir os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		fileInfo, err := dir.Info()
+		if err != nil {
+			return err
+		}
+
+		header, err := zip.FileInfoHeader(fileInfo)
+		if err != nil {
+			return err
+		}
+
+		header.Name, err = filepath.Rel(filepath.Dir(dirPath), filePath)
+		if err != nil {
+			return err
+		}
+
+		type FileType int
+		const (
+			 Regular FileType = iota
+			 Directory
+			 Symlink
+		)
+		fileType := Regular
+		if isSymlink(fileInfo) {
+			fileType = Symlink
+		} else if fileInfo.IsDir() {
+			fileType = Directory
+		}
+
+		switch fileType {
+		case Directory:
+			header.Method = zip.Store
+		case Regular, Symlink:
+			header.Method = zip.Deflate
+		default:
+			return fmt.Errorf("unsupported file type: %v", fileType)
+		}
+
+		writer, err := zipWriter.CreateHeader(header)
+		if err != nil {
+			return err
+		}
+
+		switch fileType {
+		case Regular:
+			file, err := os.Open(filePath)
+			if err != nil {
+				return err
+			}
+			defer file.Close()
+			_, err = io.Copy(writer, file)
+			return err
+		case Directory:
+			_, err = writer.Write(nil)
+			return err
+		case Symlink:
+			linkTarget, err := os.Readlink(filePath)
+			if err != nil {
+				return err
+			}
+			_, err = writer.Write([]byte(linkTarget))
+			return err
+		default:
+			return fmt.Errorf("unsupported file type: %v", fileType)
+		}
+	})
 	if err != nil {
 		panic(err)
 	}
