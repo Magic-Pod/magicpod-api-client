@@ -1,19 +1,16 @@
 package common
 
 import (
-	"archive/zip"
-	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/go-resty/resty"
-	"github.com/mholt/archives"
+	"github.com/mholt/archiver/v3"
 	"github.com/urfave/cli"
 )
 
@@ -98,30 +95,13 @@ type UploadFile struct {
 }
 
 func zipAppDir(dirPath string) string {
-	ctx := context.TODO()
-
-	files, err := archives.FilesFromDisk(ctx, nil, map[string]string{
-		dirPath: filepath.Base(dirPath),
-	})
-	if err != nil {
-		panic(err)
-	}
-
 	zipPath := dirPath + ".zip"
-	zipFile, err := os.Create(zipPath)
-	if err != nil {
+	if err := os.RemoveAll(zipPath); err != nil {
 		panic(err)
 	}
-	defer zipFile.Close()
-
-	zip := archives.Zip{
-		Compression: zip.Deflate,
-	}
-	err = zip.Archive(ctx, zipFile, files)
-	if err != nil {
+	if err := archiver.Archive([]string{dirPath}, zipPath); err != nil {
 		panic(err)
 	}
-
 	return zipPath
 }
 
@@ -156,7 +136,7 @@ func UploadApp(urlBase string, apiToken string, organization string, project str
 		if strings.HasSuffix(appPath, ".app") {
 			actualPath = zipAppDir(appPath)
 		} else {
-			return 0, cli.NewExitError(fmt.Sprintf("%s is not file but directory.", appPath), 1)
+			return 0, cli.NewExitError(fmt.Sprintf("%s is not file but direcoty.", appPath), 1)
 		}
 	} else {
 		actualPath = appPath
