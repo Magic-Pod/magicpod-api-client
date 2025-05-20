@@ -187,7 +187,11 @@ func StartBatchRun(urlBase string, apiToken string, organization string, project
 	var testSettings interface{}
 	isCrossBatchRunSetting := (testSettingsNumber != 0)
 	if setting == "" {
-		setting = "{\"test_settings_number\":" + strconv.Itoa(testSettingsNumber) + ", \"branch_name\":\"" + branchName + "\"}"
+		var branchJsonString = ""
+		if branchName != "" {
+			branchJsonString = ", \"branch_name\":\"" + branchName + "\""
+		}
+		setting = "{\"test_settings_number\":" + strconv.Itoa(testSettingsNumber) + branchJsonString + "}"
 	} else {
 		err := json.Unmarshal([]byte(setting), &testSettings)
 		if err == nil {
