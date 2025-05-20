@@ -36,7 +36,7 @@ type BatchRun struct {
 	ProjectName      string `json:"project_name"`
 	BatchRunNumber   int    `json:"batch_run_number"`
 	TestSettingName  string `json:"test_setting_name"`
-	BranchName  string `json:"branch_name"`
+	BranchName       string `json:"branch_name"`
 	Status           string `json:"status"`
 	StatusNumber     int    `json:"status_number"`
 	taskInterval
