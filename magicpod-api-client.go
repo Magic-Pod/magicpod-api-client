@@ -33,7 +33,7 @@ func main() {
 					Usage: "Test settings number defined in the project batch run page",
 				},
 				cli.StringFlag{
-					Name:  "branch_name, br",
+					Name:  "branch_name, B",
 					Usage: "Branch name",
 				},
 				cli.StringFlag{
