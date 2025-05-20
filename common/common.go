@@ -36,6 +36,7 @@ type BatchRun struct {
 	ProjectName      string `json:"project_name"`
 	BatchRunNumber   int    `json:"batch_run_number"`
 	TestSettingName  string `json:"test_setting_name"`
+	BranchName  string `json:"branch_name"`
 	Status           string `json:"status"`
 	StatusNumber     int    `json:"status_number"`
 	taskInterval
@@ -182,11 +183,11 @@ func mergeTestSettingsNumberToSetting(testSettingsMap map[string]interface{}, ha
 }
 
 // StartBatchRun starts a batch run or a cross batch run on the server
-func StartBatchRun(urlBase string, apiToken string, organization string, project string, httpHeadersMap map[string]string, testSettingsNumber int, setting string) (*BatchRun, *cli.ExitError) {
+func StartBatchRun(urlBase string, apiToken string, organization string, project string, httpHeadersMap map[string]string, testSettingsNumber int, branchName string, setting string) (*BatchRun, *cli.ExitError) {
 	var testSettings interface{}
 	isCrossBatchRunSetting := (testSettingsNumber != 0)
 	if setting == "" {
-		setting = "{\"test_settings_number\":" + strconv.Itoa(testSettingsNumber) + "}"
+		setting = "{\"test_settings_number\":" + strconv.Itoa(testSettingsNumber) + ", \"branch_name\":\"" + branchName + "\"}"
 	} else {
 		err := json.Unmarshal([]byte(setting), &testSettings)
 		if err == nil {
@@ -419,10 +420,10 @@ func printMessage(printResult bool, format string, args ...interface{}) {
 
 // ExecuteBatchRun starts batch run(s) and wait for its completion with showing progress
 func ExecuteBatchRun(urlBase string, apiToken string, organization string, project string,
-	httpHeadersMap map[string]string, testSettingsNumber int, setting string,
+	httpHeadersMap map[string]string, testSettingsNumber int, branchName string,  setting string,
 	waitForResult bool, waitLimit int, printResult bool) (*BatchRun /*on which magicpod bitrise step depends */, bool, bool, *cli.ExitError) {
 	// send batch run start request
-	batchRun, exitErr := StartBatchRun(urlBase, apiToken, organization, project, httpHeadersMap, testSettingsNumber, setting)
+	batchRun, exitErr := StartBatchRun(urlBase, apiToken, organization, project, httpHeadersMap, testSettingsNumber, branchName, setting)
 	if exitErr != nil {
 		return nil, false, false, exitErr
 	}
