@@ -199,6 +199,13 @@ func StartBatchRun(urlBase string, apiToken string, organization string, project
 			if ok {
 				_, hasTestSettings := testSettingsMap["test_settings"]
 				testSettingsNumberInJSON, hasTestSettingsNumber := testSettingsMap["test_settings_number"]
+				testSettingsBranchInJSON, hasTestSettingsBranch := testSettingsMap["branch_name"]
+				if branchName != "" {
+					if hasTestSettingsBranch && branchName != testSettingsBranchInJSON {
+						return nil, cli.NewExitError("--branch_number and --setting have different branch name", 1)
+					}
+					testSettingsMap["branch_name"] = branchName
+				}
 				if testSettingsNumber != 0 {
 					if hasTestSettingsNumber && testSettingsNumber != testSettingsNumberInJSON {
 						return nil, cli.NewExitError("--test_settings_number and --setting have different number", 1)
