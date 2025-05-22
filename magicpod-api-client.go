@@ -33,6 +33,10 @@ func main() {
 					Usage: "Test settings number defined in the project batch run page",
 				},
 				cli.StringFlag{
+					Name:  "branch_name, B",
+					Usage: "Branch name",
+				},
+				cli.StringFlag{
 					Name:  "setting, s",
 					Usage: "Test setting in JSON format. Please check https://app.magicpod.com/api/v1.0/doc/ for more detail",
 				},
@@ -326,6 +330,7 @@ func batchRunAction(c *cli.Context) error {
 		return err
 	}
 	testSettingsNumber := c.Int("test_settings_number")
+	branchName := c.String("branch_name")
 	setting := c.String("setting")
 	if testSettingsNumber == 0 && setting == "" {
 		return cli.NewExitError("Either of --test_settings_number or --setting option is required", 1)
@@ -334,7 +339,7 @@ func batchRunAction(c *cli.Context) error {
 	waitLimit := c.Int("wait_limit")
 
 	_, existsErr, existsUnresolved, batchRunError := common.ExecuteBatchRun(urlBase, apiToken, organization,
-		project, httpHeadersMap, testSettingsNumber, setting, !noWait, waitLimit, true)
+		project, httpHeadersMap, testSettingsNumber, branchName, setting, !noWait, waitLimit, true)
 	if batchRunError != nil {
 		return batchRunError
 	}
