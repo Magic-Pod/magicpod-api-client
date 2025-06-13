@@ -122,7 +122,7 @@ func main() {
 				},
 				cli.StringFlag{
 					Name:  "download_path, d",
-					Usage: "Download destination file path. If empty string is speficied, the path will be ./screenshots.zip",
+					Usage: "Download destination file path. If empty string is specified, the path will be ./screenshots.zip",
 				},
 				cli.StringFlag{
 					Name:  "file_index_type, i",
@@ -149,7 +149,7 @@ func main() {
 					Usage: "Not output any logs during download. Disabled by default",
 				},
 			}...),
-			Action: getScrenshotsAction,
+			Action: getScreenshotsAction,
 		},
 		{
 			Name:  "wait-for-batch-run",
@@ -267,7 +267,7 @@ func deleteAppAction(c *cli.Context) error {
 	return nil
 }
 
-func getScrenshotsAction(c *cli.Context) error {
+func getScreenshotsAction(c *cli.Context) error {
 	// handle command line arguments
 	urlBase, apiToken, organization, project, httpHeadersMap, err := parseCommonFlags(c)
 	if err != nil {

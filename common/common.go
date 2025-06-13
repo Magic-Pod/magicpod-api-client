@@ -137,7 +137,7 @@ func UploadApp(urlBase string, apiToken string, organization string, project str
 		if strings.HasSuffix(appPath, ".app") {
 			actualPath = zipAppDir(appPath)
 		} else {
-			return 0, cli.NewExitError(fmt.Sprintf("%s is not file but direcoty.", appPath), 1)
+			return 0, cli.NewExitError(fmt.Sprintf("%s is not file but directory.", appPath), 1)
 		}
 	} else {
 		actualPath = appPath
