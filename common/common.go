@@ -95,6 +95,19 @@ type UploadFile struct {
 	FileNo int `json:"file_no"`
 }
 
+type UploadDataPatternCsvResponse struct {
+	Status string `json:"status"`
+	Errors struct {
+		Validation []struct {
+			Row     int    `json:"row"`
+			Message string `json:"message"`
+		} `json:"validation"`
+		Save []struct {
+			Message string `json:"message"`
+		} `json:"save"`
+	} `json:"errors"`
+}
+
 func zipAppDir(dirPath string) string {
 	zipPath := dirPath + ".zip"
 	if err := os.RemoveAll(zipPath); err != nil {
@@ -539,4 +552,124 @@ func WaitForBatchRunResult(urlBase string, apiToken string, organization string,
 		}
 	}
 	return batchRun, existsErr, existsUnresolved, nil
+}
+
+func UploadDataPatternCsv(urlBase string, apiToken string, organization string, project string, testCaseNumber int, httpHeadersMap map[string]string, csvFilePath string, overwrite bool, waitLimit int, printResult bool) error {
+	stat, err := os.Stat(csvFilePath)
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("Error\n%s does not exist", csvFilePath), 1)
+	}
+	if stat.Mode().IsDir() {
+		return cli.NewExitError(fmt.Sprintf("Error\n%s is not file but directory", csvFilePath), 1)
+	}
+	if stat.Size() == 0 {
+		return cli.NewExitError(fmt.Sprintf("Error\n%s is empty", csvFilePath), 1)
+	}
+	printMessage(printResult, "Uploading data pattern CSV file.. \n")
+	batchTaskId, err := RequestUploadingDataPatternCsv(urlBase, apiToken, organization, project, testCaseNumber, httpHeadersMap, csvFilePath, overwrite)
+	if err != nil {
+		return err
+	}
+	interval := 5
+	passedSeconds := 0
+	actualWaitLimit := waitLimit
+	defaultTimeout := 300
+	if waitLimit == -1 {
+		actualWaitLimit = defaultTimeout
+	}
+	for {
+		response := GetBatchTaskUploadDataPatternCsvStatus(urlBase, apiToken, organization, project, httpHeadersMap, batchTaskId)
+		if response.Status == "succeeded" {
+			printMessage(printResult, "\nDone\n")
+			break
+		} else if response.Status == "running" {
+			printMessage(printResult, ".")
+		} else {
+			message := "\nUpload data pattern CSV failed:\n"
+			if len(response.Errors.Validation) > 0 {
+				message += "  Validation error:\n"
+				for _, v := range response.Errors.Validation {
+					message += fmt.Sprintf("    row %d: %s\n", v.Row, v.Message)
+				}
+			}
+			if len(response.Errors.Save) > 0 {
+				message += "  Save error:\n"
+				for _, v := range response.Errors.Save {
+					message += fmt.Sprintf("    %s\n", v.Message)
+				}
+			}
+			return cli.NewExitError(message, 1)
+		}
+		if passedSeconds > 60 {
+			interval = 10
+		}
+		if passedSeconds > 120 {
+			interval = 30
+		}
+		if passedSeconds >= actualWaitLimit {
+			errorMessage := fmt.Sprintf("\nReached timeout of %d seconds while waiting for uploading data pattern CSV file.", actualWaitLimit)
+			if waitLimit == -1 {
+				errorMessage += fmt.Sprintf("  Default timeout is %d seconds.  If it's not enough, please specify a longer value by --wait_limit or -w option.", defaultTimeout)
+			}
+			return cli.NewExitError(errorMessage, 1)
+		}
+		time.Sleep(time.Duration(interval) * time.Second)
+		passedSeconds += interval
+	}
+	return nil
+}
+
+func RequestUploadingDataPatternCsv(urlBase string, apiToken string, organization string, project string, testCaseNumber int, httpHeadersMap map[string]string, csvFilePath string, overwrite bool) (int, error) {
+	res, err := createBaseRequest(urlBase, apiToken, organization, project, httpHeadersMap).
+		SetPathParams(map[string]string{
+			"test_case_number": strconv.Itoa(testCaseNumber),
+		}).
+		SetFormData(map[string]string{
+			"overwrite": strconv.FormatBool(overwrite),
+		}).
+		SetFile("file", csvFilePath).
+		SetResult(map[string]int{}).
+		Post("/{organization}/{project}/test-cases/{test_case_number}/start-upload-data-patterns/")
+	if err != nil {
+		panic(err)
+	}
+	if res.IsError() {
+		message := fmt.Sprintf("Error\n  %s:\n", res.Status())
+		// Handle the request error response
+		var errResp []string
+		if err = json.Unmarshal(res.Body(), &errResp); err == nil {
+			for _, e := range errResp {
+				message += fmt.Sprintf("    %s\n", e)
+			}
+		} else {
+			// Handle the field-specific error response
+			var errResp map[string][]string
+			if err = json.Unmarshal(res.Body(), &errResp); err == nil {
+				for _, errors := range errResp {
+					for _, e := range errors {
+						message += fmt.Sprintf("    %s\n", e)
+					}
+				}
+			} else {
+				// Fallback if the error couldn't be unmarshaled into ErrorResponse
+				message += fmt.Sprintf("  unhandled format: %s\n", res.String())
+			}
+		}
+		return 0, cli.NewExitError(message, 1)
+	}
+	responseJson := res.Result().(*map[string]int)
+	return (*responseJson)["batch_task_id"], nil
+}
+
+func GetBatchTaskUploadDataPatternCsvStatus(urlBase string, apiToken string, organization string, project string, httpHeadersMap map[string]string, batchTaskId int) *UploadDataPatternCsvResponse {
+	res, err := createBaseRequest(urlBase, apiToken, organization, project, httpHeadersMap).
+		SetPathParams(map[string]string{
+			"batch_task_id": strconv.Itoa(batchTaskId),
+		}).
+		SetResult(UploadDataPatternCsvResponse{}).
+		Get("/{organization}/{project}/batch-task/{batch_task_id}/")
+	if err != nil {
+		panic(err)
+	}
+	return res.Result().(*UploadDataPatternCsvResponse)
 }
