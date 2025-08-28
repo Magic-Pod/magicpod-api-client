@@ -146,7 +146,7 @@ func main() {
 				},
 				cli.BoolFlag{
 					Name:  "quiet, q",
-					Usage: "Not output any logs during download. Disabled by default",
+					Usage: "Do not output any logs during download. Disabled by default",
 				},
 			}...),
 			Action: getScreenshotsAction,
@@ -188,7 +188,7 @@ func main() {
 				},
 				cli.BoolFlag{
 					Name:  "quiet, q",
-					Usage: "Not output any logs during download. Disabled by default",
+					Usage: "Do not output any logs during upload. Disabled by default",
 				},
 			}...),
 			Action: uploadDataPatternCsvAction,
