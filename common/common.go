@@ -426,7 +426,7 @@ func GetScreenshots(urlBase string, apiToken string, organization string, projec
 		if passedSeconds >= actualWaitLimit {
 			errorMessage := fmt.Sprintf("\nReached timeout of %d seconds while waiting for screenshots download.", actualWaitLimit)
 			if waitLimit == -1 {
-				errorMessage += fmt.Sprintf("  Default timeout is %d seconds.  If it's not enough, please specify a longer value by --wait_limit or -w option.", defaultTimeout)
+				errorMessage += fmt.Sprintf("  Default timeout is %d seconds. If it's not enough, please specify a longer value by --wait_limit or -w option.", defaultTimeout)
 			}
 			return cli.NewExitError(errorMessage, 1)
 		}
@@ -609,7 +609,7 @@ func UploadDataPatternCsv(urlBase string, apiToken string, organization string, 
 		if passedSeconds >= actualWaitLimit {
 			errorMessage := fmt.Sprintf("\nReached timeout of %d seconds while waiting for uploading data pattern CSV file.", actualWaitLimit)
 			if waitLimit == -1 {
-				errorMessage += fmt.Sprintf("  Default timeout is %d seconds.  If it's not enough, please specify a longer value by --wait_limit or -w option.", defaultTimeout)
+				errorMessage += fmt.Sprintf("  Default timeout is %d seconds. If it's not enough, please specify a longer value by --wait_limit or -w option.", defaultTimeout)
 			}
 			return cli.NewExitError(errorMessage, 1)
 		}
