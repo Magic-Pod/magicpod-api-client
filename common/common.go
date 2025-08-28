@@ -557,13 +557,13 @@ func WaitForBatchRunResult(urlBase string, apiToken string, organization string,
 func UploadDataPatternCsv(urlBase string, apiToken string, organization string, project string, testCaseNumber int, httpHeadersMap map[string]string, csvFilePath string, overwrite bool, waitLimit int, printResult bool) error {
 	stat, err := os.Stat(csvFilePath)
 	if err != nil {
-		return cli.NewExitError(fmt.Sprintf("Error\n%s does not exist", csvFilePath), 1)
+		return cli.NewExitError(fmt.Sprintf("Error\n  %s does not exist", csvFilePath), 1)
 	}
 	if stat.Mode().IsDir() {
-		return cli.NewExitError(fmt.Sprintf("Error\n%s is not file but directory", csvFilePath), 1)
+		return cli.NewExitError(fmt.Sprintf("Error\n  %s is not file but directory", csvFilePath), 1)
 	}
 	if stat.Size() == 0 {
-		return cli.NewExitError(fmt.Sprintf("Error\n%s is empty", csvFilePath), 1)
+		return cli.NewExitError(fmt.Sprintf("Error\n  %s is empty", csvFilePath), 1)
 	}
 	printMessage(printResult, "Uploading data pattern CSV file.. \n")
 	batchTaskId, err := RequestUploadingDataPatternCsv(urlBase, apiToken, organization, project, testCaseNumber, httpHeadersMap, csvFilePath, overwrite)
