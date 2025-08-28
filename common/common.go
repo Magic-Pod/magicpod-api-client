@@ -657,7 +657,7 @@ func RequestUploadingDataPatternCsv(urlBase string, apiToken string, organizatio
 					}
 				} else {
 					// Fallback if the error couldn't be unmarshaled into ErrorResponse
-					message += fmt.Sprintf("    unhandled format: %s\n", res.String())
+					message += fmt.Sprintf("    %s\n", res.String())
 				}
 			}
 		}
