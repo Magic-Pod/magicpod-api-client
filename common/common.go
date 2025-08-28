@@ -635,24 +635,30 @@ func RequestUploadingDataPatternCsv(urlBase string, apiToken string, organizatio
 	}
 	if res.IsError() {
 		message := fmt.Sprintf("Error\n  %s:\n", res.Status())
-		// Handle the request error response
+		// Handle various type of error response
 		var errResp []string
 		if err = json.Unmarshal(res.Body(), &errResp); err == nil {
 			for _, e := range errResp {
 				message += fmt.Sprintf("    %s\n", e)
 			}
 		} else {
-			// Handle the field-specific error response
-			var errResp map[string][]string
+			var errResp map[string]string
 			if err = json.Unmarshal(res.Body(), &errResp); err == nil {
-				for _, errors := range errResp {
-					for _, e := range errors {
-						message += fmt.Sprintf("    %s\n", e)
-					}
+				for _, e := range errResp {
+					message += fmt.Sprintf("    %s\n", e)
 				}
 			} else {
-				// Fallback if the error couldn't be unmarshaled into ErrorResponse
-				message += fmt.Sprintf("  unhandled format: %s\n", res.String())
+				var errResp map[string][]string
+				if err = json.Unmarshal(res.Body(), &errResp); err == nil {
+					for _, errors := range errResp {
+						for _, e := range errors {
+							message += fmt.Sprintf("    %s\n", e)
+						}
+					}
+				} else {
+					// Fallback if the error couldn't be unmarshaled into ErrorResponse
+					message += fmt.Sprintf("    unhandled format: %s\n", res.String())
+				}
 			}
 		}
 		return 0, cli.NewExitError(message, 1)
