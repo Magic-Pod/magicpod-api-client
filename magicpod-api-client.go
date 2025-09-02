@@ -146,7 +146,7 @@ func main() {
 				},
 				cli.BoolFlag{
 					Name:  "quiet, q",
-					Usage: "Not output any logs during download. Disabled by default",
+					Usage: "Do not output any logs during download. Disabled by default",
 				},
 			}...),
 			Action: getScreenshotsAction,
@@ -165,6 +165,33 @@ func main() {
 				},
 			}...),
 			Action: waitForBatchRunAction,
+		},
+		{
+			Name:  "upload-data-pattern-csv",
+			Usage: "Upload data pattern CSV file",
+			Flags: append(commonFlags(), []cli.Flag{
+				cli.IntFlag{
+					Name:  "test_case_number, T",
+					Usage: "Test case number",
+				},
+				cli.StringFlag{
+					Name:  "csv_file_path, c",
+					Usage: "Path to the CSV file to upload",
+				},
+				cli.BoolFlag{
+					Name:  "overwrite, O",
+					Usage: "If true, the existing data patterns will be overwritten. If false, an error is raised if the data pattern already exists",
+				},
+				cli.IntFlag{
+					Name:  "wait_limit, w",
+					Usage: "Wait limit in seconds. The default value is 300",
+				},
+				cli.BoolFlag{
+					Name:  "quiet, q",
+					Usage: "Do not output any logs during upload. Disabled by default",
+				},
+			}...),
+			Action: uploadDataPatternCsvAction,
 		},
 	}
 	app.Run(os.Args)
@@ -432,4 +459,33 @@ func parseCommonFlags(c *cli.Context) (string, string, string, string, map[strin
 		}
 	}
 	return urlBase, apiToken, organization, project, httpHeadersMap, err
+}
+
+
+func uploadDataPatternCsvAction(c *cli.Context) error {
+	// handle command line arguments
+	urlBase, apiToken, organization, project, httpHeadersMap, err := parseCommonFlags(c)
+	if err != nil {
+		return err
+	}
+	testCaseNumber := c.Int("test_case_number")
+	if testCaseNumber == 0 {
+		return cli.NewExitError("--test_case_number option is not specified or 0", 1)
+	}
+	csvFilePath := c.String("csv_file_path")
+	if csvFilePath == "" {
+		return cli.NewExitError("--csv_file_path option is required", 1)
+	}
+	overwrite := c.Bool("overwrite")
+	waitLimit := c.Int("wait_limit")
+	if waitLimit == 0 {
+		waitLimit = -1
+	}
+	quiet := c.Bool("quiet")
+
+	exitErr := common.UploadDataPatternCsv(urlBase, apiToken, organization, project, testCaseNumber, httpHeadersMap, csvFilePath, overwrite, waitLimit, !quiet)
+	if exitErr != nil {
+		return exitErr
+	}
+	return nil
 }
