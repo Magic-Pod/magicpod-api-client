@@ -177,7 +177,7 @@ func mergeTestSettingsNumberToSetting(testSettingsMap map[string]interface{}, ha
 		miscSettings := make(map[string]interface{})
 		keysToDelete := []string{}
 		for k, v := range testSettingsMap {
-			if k != "test_settings_number" && k != "concurrency" && k != "test_settings_name" {
+			if k != "test_settings_number" && k != "concurrency" && k != "test_settings_name" && k != "branch_name" {
 				miscSettings[k] = v
 				keysToDelete = append(keysToDelete, k)
 			}
