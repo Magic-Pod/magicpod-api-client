@@ -95,7 +95,6 @@ See the details.
 Run the following in the top directory of this repository.
 
 ```
-go get -d .
 go build
 ```
 
