@@ -4,25 +4,34 @@ go 1.27.3
 
 require (
 	github.com/go-resty/resty v0.0.0-00010101000000-000000000000
-	github.com/mholt/archiver/v3 v3.3.2
+	github.com/mholt/archives v0.1.5
 	github.com/urfave/cli v1.22.5
 )
 
 require (
-	github.com/andybalholm/brotli v1.0.0 // indirect
+	github.com/STARRY-S/zip v0.2.3 // indirect
+	github.com/andybalholm/brotli v1.2.0 // indirect
+	github.com/bodgit/plumbing v1.3.0 // indirect
+	github.com/bodgit/sevenzip v1.6.1 // indirect
+	github.com/bodgit/windows v1.0.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
-	github.com/dsnet/compress v0.0.1 // indirect
-	github.com/frankban/quicktest v1.14.0 // indirect
-	github.com/golang/snappy v0.0.4 // indirect
-	github.com/klauspost/compress v1.10.10 // indirect
-	github.com/klauspost/pgzip v1.2.4 // indirect
-	github.com/nwaples/rardecode v1.1.2 // indirect
-	github.com/pierrec/lz4/v3 v3.3.2 // indirect
+	github.com/dsnet/compress v0.0.2-0.20230904184137-39efe44ab707 // indirect
+	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
+	github.com/klauspost/compress v1.18.7 // indirect
+	github.com/klauspost/pgzip v1.2.6 // indirect
+	github.com/mikelolasagasti/xz v1.0.1 // indirect
+	github.com/minio/minlz v1.0.1 // indirect
+	github.com/nwaples/rardecode/v2 v2.2.0 // indirect
+	github.com/pierrec/lz4/v4 v4.1.22 // indirect
 	github.com/russross/blackfriday/v2 v2.0.1 // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
-	github.com/ulikunitz/xz v0.5.14 // indirect
-	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
+	github.com/sorairolake/lzip-go v0.3.8 // indirect
+	github.com/spf13/afero v1.15.0 // indirect
+	github.com/ulikunitz/xz v0.5.15 // indirect
+	go4.org v0.0.0-20230225012048-214862532bf5 // indirect
 	golang.org/x/net v0.55.0 // indirect
+	golang.org/x/text v0.37.0 // indirect
+	gopkg.in/resty.v1 v1.12.0 // indirect
 )
 
 replace github.com/go-resty/resty => gopkg.in/resty.v1 v1.11.0

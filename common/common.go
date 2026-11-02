@@ -1,16 +1,19 @@
 package common
 
 import (
+	"archive/zip"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/go-resty/resty"
-	"github.com/mholt/archiver/v3"
+	"github.com/mholt/archives"
 	"github.com/urfave/cli"
 )
 
@@ -113,7 +116,17 @@ func zipAppDir(dirPath string) string {
 	if err := os.RemoveAll(zipPath); err != nil {
 		panic(err)
 	}
-	if err := archiver.Archive([]string{dirPath}, zipPath); err != nil {
+	ctx := context.Background()
+	files, err := archives.FilesFromDisk(ctx, nil, map[string]string{filepath.Clean(dirPath): filepath.Base(dirPath)})
+	if err != nil {
+		panic(err)
+	}
+	out, err := os.Create(zipPath)
+	if err != nil {
+		panic(err)
+	}
+	defer out.Close()
+	if err := (archives.Zip{Compression: zip.Deflate, SelectiveCompression: true}).Archive(ctx, out, files); err != nil {
 		panic(err)
 	}
 	return zipPath
